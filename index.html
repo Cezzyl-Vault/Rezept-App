@@ -17,71 +17,30 @@
 <body>
   <header class="kopf">
     <button id="zurueck" class="kopf-btn" type="button" aria-label="Zurück" hidden>‹</button>
-    <h1 id="titel">Meine Rezepte</h1>
+    <h1 id="titel">Rezepte</h1>
+    <div id="kopf-aktionen" class="kopf-aktionen"></div>
+    <button id="konto-btn" class="kopf-btn konto-btn" type="button" aria-label="Teilen und Konto" title="Teilen & Konto" hidden>
+      👥<span id="sync-punkt" class="sync-punkt"></span>
+    </button>
   </header>
+  <div id="hinweis-leiste" class="hinweis-leiste" hidden></div>
 
-  <main>
-    <!-- Liste aller Rezepte -->
-    <section id="ansicht-liste" class="ansicht">
-      <input id="suche" class="suche" type="search" placeholder="Rezept suchen …" autocomplete="off">
-      <ul id="liste" class="raster"></ul>
-      <p id="keine-treffer" class="leer" hidden>Kein Rezept gefunden.</p>
-      <div id="leer" class="leer" hidden>
-        <div class="leer-symbol">📷</div>
-        <p>Noch keine Rezepte.</p>
-        <p>Tippe unten auf <strong>+</strong> und fotografiere dein erstes Rezept.</p>
-      </div>
-    </section>
+  <main id="inhalt"></main>
 
-    <!-- Neues Rezept anlegen -->
-    <section id="ansicht-neu" class="ansicht" hidden>
-      <div id="neu-fotos" class="foto-streifen"></div>
-      <button id="weiteres-foto" class="btn zweit" type="button">+ Weiteres Foto (z. B. Rückseite)</button>
-      <label class="feld">Titel
-        <input id="neu-titel" type="text" placeholder="z. B. Omas Apfelkuchen" enterkeyhint="done">
-      </label>
-      <label class="feld">Notiz <span class="hinweis">(optional)</span>
-        <textarea id="neu-notiz" rows="3" placeholder="z. B. doppelte Menge Zimt"></textarea>
-      </label>
-      <button id="speichern" class="btn" type="button">Speichern</button>
-    </section>
+  <button id="neu-btn" class="fab" type="button" aria-label="Neues Rezept" hidden>+</button>
 
-    <!-- Einzelnes Rezept -->
-    <section id="ansicht-rezept" class="ansicht" hidden>
-      <div id="rezept-fotos" class="rezept-fotos"></div>
-      <label class="feld">Titel
-        <input id="rezept-titel" type="text" enterkeyhint="done">
-      </label>
-      <label class="feld">Notiz
-        <textarea id="rezept-notiz" rows="3" placeholder="Eigene Anmerkungen …"></textarea>
-      </label>
-      <p id="rezept-datum" class="meta"></p>
-      <button id="loeschen" class="btn gefahr" type="button">Rezept löschen</button>
-    </section>
-  </main>
+  <nav id="tabs" class="tabs" hidden>
+    <a href="#/" data-tab="rezepte"><span aria-hidden="true">📖</span>Rezepte</a>
+    <a href="#/plan" data-tab="plan"><span aria-hidden="true">📅</span>Wochenplan</a>
+    <a href="#/einkauf" data-tab="einkauf"><span aria-hidden="true">🛒</span>Einkauf</a>
+  </nav>
 
-  <button id="neu-btn" class="fab" type="button" aria-label="Rezept fotografieren">+</button>
-
-  <!-- Auswahl: Kamera oder Galerie -->
-  <div id="auswahl" class="auswahl" hidden>
-    <div class="auswahl-karte" role="dialog" aria-label="Foto hinzufügen">
-      <button id="aus-kamera" class="btn" type="button">📷 Foto aufnehmen</button>
-      <button id="aus-galerie" class="btn zweit" type="button">🖼️ Aus Galerie wählen</button>
-      <button id="auswahl-abbrechen" class="btn text" type="button">Abbrechen</button>
-    </div>
-  </div>
-
-  <!-- Foto in groß -->
-  <div id="vollbild" class="vollbild" hidden>
-    <button id="vollbild-zu" class="kopf-btn vollbild-zu" type="button" aria-label="Schließen">✕</button>
-    <img id="vollbild-bild" alt="">
-  </div>
-
-  <div id="meldung" class="meldung" hidden></div>
+  <div id="overlays"></div>
+  <div id="meldung" class="meldung" role="status" hidden></div>
 
   <input id="kamera" type="file" accept="image/*" capture="environment" hidden>
   <input id="galerie" type="file" accept="image/*" multiple hidden>
 
-  <script src="app.js"></script>
+  <script type="module" src="js/app.js"></script>
 </body>
 </html>

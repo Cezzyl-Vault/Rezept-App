@@ -1,7 +1,7 @@
 {
   "name": "Meine Rezepte",
   "short_name": "Rezepte",
-  "description": "Rezepte fotografieren und auf dem Handy sammeln",
+  "description": "Rezepte sammeln, Woche planen, Einkaufsliste teilen",
   "lang": "de",
   "start_url": "./",
   "scope": "./",
