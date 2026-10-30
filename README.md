@@ -14,7 +14,7 @@ Die App ist eine **Web-App (PWA)**. Man öffnet sie einmal im Browser und legt s
 - **Kochmodus**: Zutaten und Schritte abhaken, der Bildschirm bleibt an
 - **Kategorien und eigene Schlagwörter** (Hauptspeise, Nachtisch, Vegan … oder „Mag Melli“) mit Filtern
 - **Suche** in Titel, Zutaten und Schritten, dazu **„Was hab ich da?“**: vorhandene Zutaten eingeben, passende Rezepte stehen oben
-- **Wochenplan** (Mo–So) mit Personenzahl pro Gericht, auch Essen ohne Rezept („Kalt“, „Reste“)
+- **Wochenplan** (Mo–So) mit Frühstück, Mittag und Abend und Personenzahl pro Gericht, auch Essen ohne Rezept („Kalt“, „Reste“)
 - **Vorschläge beim Einplanen**: „Oft & gern“ und „Lange nicht mehr“, berechnet aus dem bisherigen Wochenplan
 - **Einkaufsliste**: Zutaten der Woche oder eines Rezepts übernehmen, gleiche Zutaten werden zusammengezählt, alles bleibt bearbeitbar. Abhaken klappt auch im Supermarkt ohne Netz.
 - **Gemeinsam nutzen**: mehrere Handys teilen sich einen „Haushalt“ (Einladecode), Änderungen erscheinen sofort auf den anderen Geräten
@@ -29,7 +29,7 @@ Ohne eingerichtete Datenbank funktioniert alles nur auf einem Handy.
 4. Unter **Authentication → URL Configuration** als **Site URL** die Adresse der App eintragen (z. B. `https://cezzyl-vault.github.io/Rezept-App/`). Dorthin führt der Bestätigungslink in der Registrierungs-Mail.
 5. Änderungen committen und pushen.
 
-**Bestehende Installationen** (vor November 2026 eingerichtet): einmal [`supabase/update-2.sql`](supabase/update-2.sql) im SQL Editor ausführen. Damit kann der Wochenplan Essen ohne Rezept speichern.
+**Bestehende Installationen** (vor November 2026 eingerichtet): einmal [`supabase/update-2.sql`](supabase/update-2.sql) und [`supabase/update-3.sql`](supabase/update-3.sql) im SQL Editor ausführen. Damit kann der Wochenplan Essen ohne Rezept und Mahlzeiten speichern.
 
 Danach in der App oben rechts auf das Personen-Symbol tippen, registrieren, **Haushalt anlegen** und den Einladecode an die anderen weitergeben. Bisher nur lokal gespeicherte Rezepte werden dabei übernommen.
 

@@ -396,7 +396,7 @@ body.mit-tabs main { padding-bottom: calc(env(safe-area-inset-bottom) + var(--ta
   cursor: pointer;
   flex: 0 0 auto;
 }
-.rund.klein { width: 30px; height: 30px; }
+.rund.klein { width: 28px; height: 28px; }
 
 .mini {
   display: inline-flex;
@@ -549,9 +549,11 @@ img.fehlt { min-width: 120px; }
 
 .portionen { display: flex; align-items: center; gap: 10px; color: var(--text-leise); font-size: 15px; }
 .portionen strong { color: var(--text); font-size: 17px; }
-.portionen.klein { gap: 6px; font-size: 13.5px; }
+.portionen.klein { gap: 2px; font-size: 13px; }
+.plan-eintrag { gap: 8px; }
+.plan-eintrag .mini { width: 30px; }
 .portionen span { min-width: 96px; text-align: center; }
-.portionen.klein span { min-width: 34px; }
+.portionen.klein span { min-width: 30px; }
 
 .zutaten { list-style: none; padding: 4px 18px; margin: 0; background: var(--flaeche); border: 1px solid var(--linie); border-radius: var(--radius); }
 .zutat { display: flex; align-items: baseline; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--linie); cursor: pointer; }
@@ -652,9 +654,31 @@ details summary { cursor: pointer; }
   padding: 6px 0;
   cursor: pointer;
 }
+.plan-titel { overflow: hidden; }
+.plan-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .plan-eintrag.frei .plan-titel { font-style: italic; color: var(--text-leise); cursor: default; }
 .plan-eintrag.frei .icon { color: var(--text-sehr-leise); }
 .marke-klein { color: var(--gut); display: inline-flex; }
+
+.mahlzeit-etikett {
+  flex: 0 0 58px;
+  padding: 4px 0;
+  border-radius: 999px;
+  border: 1px solid var(--linie-stark);
+  background: transparent;
+  color: var(--text-leise);
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-align: center;
+  cursor: pointer;
+}
+.mahlzeit-etikett.frueh { color: #e9c77a; border-color: rgba(233, 199, 122, 0.35); background: rgba(233, 199, 122, 0.08); }
+.mahlzeit-etikett.mittag { color: var(--gut); border-color: rgba(156, 194, 164, 0.35); background: rgba(156, 194, 164, 0.08); }
+.mahlzeit-etikett.abend { color: var(--akzent-hell); border-color: rgba(208, 138, 91, 0.4); background: var(--akzent-zart); }
+.mahlzeit-etikett.leer { color: var(--text-sehr-leise); border-style: dashed; }
+.mahlzeit-wahl { margin: 0 0 14px; }
 .tag .btn.text.links { padding: 10px 2px; font-size: 14.5px; }
 
 .reiter { display: flex; gap: 4px; padding: 4px; margin: 14px 0 12px; background: var(--flaeche-2); border-radius: 999px; }

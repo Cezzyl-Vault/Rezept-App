@@ -1,6 +1,6 @@
 // Speichert die App-Dateien zwischen, damit die App auch ohne Internet startet.
 // Bei jeder Änderung an den Dateien VERSION erhöhen, sonst sehen Nutzer die alte Version.
-const VERSION = 'rezepte-v3';
+const VERSION = 'rezepte-v4';
 const DATEIEN = [
   './',
   'index.html',

@@ -45,6 +45,7 @@ create table if not exists public.plan (
   datum date not null,
   rezept_id uuid references public.rezepte on delete cascade,
   titel text, -- Essen ohne Rezept, z. B. "Kalt"
+  mahlzeit text, -- 'frueh' | 'mittag' | 'abend' oder leer
   portionen int,
   auf_liste boolean not null default false,
   erstellt_am timestamptz not null default now(),
@@ -70,6 +71,12 @@ alter table public.plan add column if not exists titel text;
 alter table public.plan drop constraint if exists plan_rezept_oder_titel;
 alter table public.plan add constraint plan_rezept_oder_titel
   check (rezept_id is not null or nullif(trim(titel), '') is not null);
+
+-- entspricht update-3.sql
+alter table public.plan add column if not exists mahlzeit text;
+alter table public.plan drop constraint if exists plan_mahlzeit;
+alter table public.plan add constraint plan_mahlzeit
+  check (mahlzeit is null or mahlzeit in ('frueh', 'mittag', 'abend'));
 
 create index if not exists rezepte_haushalt on public.rezepte (haushalt_id);
 create index if not exists plan_haushalt on public.plan (haushalt_id, datum);
