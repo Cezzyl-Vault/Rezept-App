@@ -3,36 +3,40 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#b5512a">
+  <meta name="theme-color" content="#14110f">
+  <meta name="color-scheme" content="dark">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Rezepte">
   <title>Rezepte</title>
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon-192.png" type="image/png">
   <link rel="apple-touch-icon" href="icons/icon-180.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&display=swap">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <header class="kopf">
-    <button id="zurueck" class="kopf-btn" type="button" aria-label="Zurück" hidden>‹</button>
+    <button id="zurueck" class="kopf-btn" type="button" aria-label="Zurück" data-icon="zurueck" hidden></button>
     <h1 id="titel">Rezepte</h1>
     <div id="kopf-aktionen" class="kopf-aktionen"></div>
     <button id="konto-btn" class="kopf-btn konto-btn" type="button" aria-label="Teilen und Konto" title="Teilen & Konto" hidden>
-      👥<span id="sync-punkt" class="sync-punkt"></span>
+      <span data-icon="personen"></span><span id="sync-punkt" class="sync-punkt"></span>
     </button>
   </header>
   <div id="hinweis-leiste" class="hinweis-leiste" hidden></div>
 
   <main id="inhalt"></main>
 
-  <button id="neu-btn" class="fab" type="button" aria-label="Neues Rezept" hidden>+</button>
+  <button id="neu-btn" class="fab" type="button" aria-label="Neues Rezept" data-icon="plus" hidden></button>
 
   <nav id="tabs" class="tabs" hidden>
-    <a href="#/" data-tab="rezepte"><span aria-hidden="true">📖</span>Rezepte</a>
-    <a href="#/plan" data-tab="plan"><span aria-hidden="true">📅</span>Wochenplan</a>
-    <a href="#/einkauf" data-tab="einkauf"><span aria-hidden="true">🛒</span>Einkauf</a>
+    <a href="#/" data-tab="rezepte"><span data-icon="buch"></span>Rezepte</a>
+    <a href="#/plan" data-tab="plan"><span data-icon="kalender"></span>Wochenplan</a>
+    <a href="#/einkauf" data-tab="einkauf"><span data-icon="wagen"></span>Einkauf</a>
   </nav>
 
   <div id="overlays"></div>

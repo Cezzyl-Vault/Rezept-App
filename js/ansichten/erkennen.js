@@ -1,5 +1,6 @@
 // Fotos eines neuen Rezepts: Text erkennen und Zeilen einsortieren – oder nur als Foto speichern.
 import { h, fuelle } from '../dom.js';
+import { icon } from '../icons.js';
 import { setzeKopf, zeigeTabs, zeigeFab, zeigeMeldung, zeigeFehler, waehleFotos, waehle, versteckeMeldung } from '../ui.js';
 import { gehe } from '../navigation.js';
 import { bildUrl } from '../bilder.js';
@@ -55,7 +56,7 @@ export async function zeige(bereich) {
     for (const pfad of r.fotos) {
       const blob = await entwurfFoto(pfad) || await ladeFoto(pfad);
       elemente.push(h('figure', {},
-        blob ? h('img', { src: bildUrl(blob), alt: '' }) : h('div', { class: 'platzhalter klein' }, '📷'),
+        blob ? h('img', { src: bildUrl(blob), alt: '' }) : h('div', { class: 'platzhalter klein' }, icon('bild')),
         entwurf.neu ? h('button', {
           class: 'foto-entfernen', type: 'button', 'aria-label': 'Foto entfernen',
           onclick: () => {
@@ -65,7 +66,7 @@ export async function zeige(bereich) {
             zeichneFotos();
             zeichneInhalt();
           },
-        }, '✕') : null));
+        }, icon('kreuz', { groesse: 16 })) : null));
     }
     if (entwurf.neu) elemente.push(h('button', { class: 'foto-neu', type: 'button', onclick: weiteresFoto }, '+ Foto\n(z. B. Rückseite)'));
     fuelle(fotos, ...elemente);
@@ -73,8 +74,8 @@ export async function zeige(bereich) {
 
   function weiteresFoto() {
     waehle('Weiteres Foto', [
-      { wert: 'kamera', text: '📷 Foto aufnehmen', klasse: '', sofort: () => waehleFotos('kamera', dazu) },
-      { wert: 'galerie', text: '🖼️ Aus Galerie wählen', sofort: () => waehleFotos('galerie', dazu) },
+      { wert: 'kamera', text: 'Foto aufnehmen', icon: 'kamera', klasse: '', sofort: () => waehleFotos('kamera', dazu) },
+      { wert: 'galerie', text: 'Aus der Galerie', icon: 'bild', sofort: () => waehleFotos('galerie', dazu) },
     ]);
   }
 
@@ -97,7 +98,7 @@ export async function zeige(bereich) {
         h('div', { class: 'karte-flach' },
           h('h2', {}, 'Text aus dem Foto holen?'),
           h('p', {}, 'Die App liest den Text direkt auf dem Handy und schlägt vor, was Zutat und was Schritt ist. Gedruckte Rezepte klappen gut, Handschrift eher schlecht.'),
-          h('button', { class: 'btn', type: 'button', onclick: starteErkennung }, '🔍 Text erkennen'),
+          h('button', { class: 'btn', type: 'button', onclick: starteErkennung }, icon('funkeln', { groesse: 20 }), 'Text erkennen'),
           entwurf.neu ? h('button', { class: 'btn zweit', type: 'button', onclick: () => gehe('#/neu', true) }, 'Ohne Texterkennung weiter') : null,
         ));
       return;

@@ -1,5 +1,6 @@
 // Gemeinsame Bedienelemente: Kopfzeile, Tabs, Meldungen, Auswahl-Blätter, Vollbild, Foto-Auswahl.
 import { $, h } from './dom.js';
+import { icon } from './icons.js';
 
 // ---------- Kopfzeile und Tabs ----------
 
@@ -9,7 +10,7 @@ export function setzeKopf({ titel, zurueck = false, aktionen = [], konto = false
   $('zurueck').hidden = !zurueck;
   $('konto-btn').hidden = !konto;
   $('kopf-aktionen').replaceChildren(...aktionen.map((a) =>
-    h('button', { class: 'kopf-btn aktion', type: 'button', 'aria-label': a.label, title: a.label, onclick: a.onclick }, a.text)));
+    h('button', { class: 'kopf-btn aktion', type: 'button', 'aria-label': a.label, title: a.label, onclick: a.onclick }, a.icon ? icon(a.icon) : a.text)));
 }
 
 export function zeigeTabs(aktiv) {
@@ -92,7 +93,7 @@ export function blatt(baue, { voll = false } = {}) {
   return new Promise((resolve) => {
     let ergebnis = null;
     const fertig = (wert) => { ergebnis = wert; schliesseOverlay(); };
-    const karte = h('div', { class: 'blatt-karte' + (voll ? ' voll' : ''), role: 'dialog' });
+    const karte = h('div', { class: 'blatt-karte' + (voll ? ' voll' : ''), role: 'dialog' }, h('div', { class: 'blatt-griff' }));
     const huelle = h('div', { class: 'blatt', onclick: (e) => { if (e.target === huelle) schliesseOverlay(); } }, karte);
     karte.append(...[baue(fertig)].flat().filter(Boolean));
     oeffneOverlay(huelle, () => resolve(ergebnis));
@@ -107,7 +108,7 @@ export function waehle(titel, optionen) {
       class: 'btn ' + (o.klasse ?? 'zweit'),
       type: 'button',
       onclick: () => { if (o.sofort) o.sofort(); fertig(o.wert); },
-    }, o.text)),
+    }, o.icon ? icon(o.icon, { groesse: 20 }) : null, o.text)),
     h('button', { class: 'btn text', type: 'button', onclick: () => fertig(null) }, 'Abbrechen'),
   ]);
 }
@@ -116,7 +117,7 @@ export function waehle(titel, optionen) {
 export function zeigeVollbild(src) {
   const bild = h('img', { src, alt: '' });
   const rahmen = h('div', { class: 'vollbild' },
-    h('button', { class: 'kopf-btn vollbild-zu', type: 'button', 'aria-label': 'Schließen', onclick: () => schliesseOverlay() }, '✕'),
+    h('button', { class: 'kopf-btn vollbild-zu', type: 'button', 'aria-label': 'Schließen', onclick: () => schliesseOverlay() }, icon('kreuz')),
     bild);
   bild.addEventListener('click', (e) => {
     const anteilX = e.offsetX / bild.clientWidth;

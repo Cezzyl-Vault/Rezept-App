@@ -2,6 +2,7 @@
 // Bleibt im Speicher, wenn man die Ansicht kurz verlässt.
 import * as speicher from './speicher.js';
 import { bereiteFotoVor, verkleinere, ladeBild } from './bilder.js';
+import { schrittText, istManuell } from './schritte.js';
 
 let entwurf = null;
 
@@ -65,7 +66,11 @@ export async function speichereEntwurf() {
 
   rezept.titel = rezept.titel.trim() || 'Rezept vom ' + new Date().toLocaleDateString('de-DE');
   rezept.zutaten = rezept.zutaten.filter((z) => z.name && z.name.trim());
-  rezept.schritte = rezept.schritte.map((s) => s.trim()).filter(Boolean);
+  // Leere Schritte weg; von Hand zugeordnete Zutaten behalten nur noch vorhandene IDs
+  const ids = new Set(rezept.zutaten.map((z) => z.id).filter(Boolean));
+  rezept.schritte = rezept.schritte
+    .map((s) => (istManuell(s) ? { text: s.text.trim(), zutaten: s.zutaten.filter((id) => ids.has(id)) } : schrittText(s).trim()))
+    .filter((s) => schrittText(s));
   const gespeichert = await speicher.speichere('rezepte', rezept);
   entwurf = null;
   if (navigator.storage && navigator.storage.persist) navigator.storage.persist();

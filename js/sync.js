@@ -8,7 +8,7 @@ import { istKonfiguriert, client, sitzung, ladeHaushalt, erreichbar, pruefe } fr
 const SPALTEN = {
   rezepte: ['id', 'haushalt_id', 'titel', 'portionen', 'zutaten', 'schritte', 'schlagwoerter', 'notiz', 'quelle_url',
     'fotos', 'vorschau', 'rohtext', 'erstellt_am', 'geaendert_am'],
-  plan: ['id', 'haushalt_id', 'datum', 'rezept_id', 'portionen', 'auf_liste', 'erstellt_am', 'geaendert_am'],
+  plan: ['id', 'haushalt_id', 'datum', 'rezept_id', 'titel', 'portionen', 'auf_liste', 'erstellt_am', 'geaendert_am'],
   einkauf: ['id', 'haushalt_id', 'name', 'menge', 'einheit', 'erledigt', 'rezept_id', 'sortierung', 'erstellt_am', 'geaendert_am'],
 };
 

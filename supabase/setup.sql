@@ -43,7 +43,8 @@ create table if not exists public.plan (
   id uuid primary key,
   haushalt_id uuid not null references public.haushalte on delete cascade,
   datum date not null,
-  rezept_id uuid not null references public.rezepte on delete cascade,
+  rezept_id uuid references public.rezepte on delete cascade,
+  titel text, -- Essen ohne Rezept, z. B. "Kalt"
   portionen int,
   auf_liste boolean not null default false,
   erstellt_am timestamptz not null default now(),
@@ -62,6 +63,13 @@ create table if not exists public.einkauf (
   erstellt_am timestamptz not null default now(),
   geaendert_am timestamptz not null default now()
 );
+
+-- Ältere Installationen auf denselben Stand bringen (entspricht update-2.sql)
+alter table public.plan alter column rezept_id drop not null;
+alter table public.plan add column if not exists titel text;
+alter table public.plan drop constraint if exists plan_rezept_oder_titel;
+alter table public.plan add constraint plan_rezept_oder_titel
+  check (rezept_id is not null or nullif(trim(titel), '') is not null);
 
 create index if not exists rezepte_haushalt on public.rezepte (haushalt_id);
 create index if not exists plan_haushalt on public.plan (haushalt_id, datum);

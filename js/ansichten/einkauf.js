@@ -1,5 +1,6 @@
 // Einkaufsliste: aus Rezepten befüllen, selbst ergänzen, abhaken.
 import { h, fuelle } from '../dom.js';
+import { icon } from '../icons.js';
 import * as speicher from '../speicher.js';
 import { setzeKopf, zeigeTabs, zeigeFab, zeigeMeldung, zeigeFehler, blatt } from '../ui.js';
 import { zerlegeZutat, zutatText, fasseZusammen, schluessel, normalisiereName } from '../zutaten.js';
@@ -17,7 +18,7 @@ export async function zeige(bereich) {
 
   const eingabe = h('input', { type: 'text', placeholder: 'Hinzufügen, z. B. 2 l Milch', enterkeyhint: 'done', autocomplete: 'off' });
   const formular = h('form', { class: 'einkauf-neu', onsubmit: (e) => { e.preventDefault(); hinzufuegen(); } },
-    eingabe, h('button', { class: 'btn klein', type: 'submit', 'aria-label': 'Hinzufügen' }, '+'));
+    eingabe, h('button', { class: 'btn klein', type: 'submit', 'aria-label': 'Hinzufügen' }, icon('plus', { groesse: 22 })));
   const liste = h('div');
   bereich.append(formular, liste);
 
@@ -42,7 +43,7 @@ export async function zeige(bereich) {
 
     fuelle(liste, 
       !eintraege.length ? h('div', { class: 'leer' },
-        h('div', { class: 'leer-symbol' }, '🛒'),
+        h('div', { class: 'leer-symbol' }, icon('wagen', { groesse: 44 })),
         h('p', {}, 'Die Einkaufsliste ist leer.'),
         h('p', {}, 'Füge Zutaten aus dem Wochenplan oder einem Rezept hinzu – oder tippe oben etwas ein.')) : null,
       h('ul', { class: 'einkauf' }, offen.map((e) => zeile(e, titel))),
@@ -66,7 +67,7 @@ export async function zeige(bereich) {
         onchange: (e) => speicher.speichere('einkauf', { ...eintrag, erledigt: e.target.checked }).catch(zeigeFehler),
       }),
       text,
-      h('button', { class: 'mini', type: 'button', 'aria-label': 'Löschen', onclick: () => speicher.loesche('einkauf', eintrag.id).catch(zeigeFehler) }, '✕'));
+      h('button', { class: 'mini', type: 'button', 'aria-label': 'Löschen', onclick: () => speicher.loesche('einkauf', eintrag.id).catch(zeigeFehler) }, icon('kreuz', { groesse: 18 })));
 
     function bearbeite() {
       bearbeitet = true;

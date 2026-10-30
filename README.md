@@ -9,10 +9,13 @@ Die App ist eine **Web-App (PWA)**. Man öffnet sie einmal im Browser und legt s
 - **Rezepte anlegen**: fotografieren, aus der Galerie wählen oder selbst eintippen (Zutaten und Schritte einzeln)
 - **Texterkennung auf dem Handy**: aus dem Foto wird Text, die App sortiert Titel, Zutaten und Schritte vor, du korrigierst per Antippen. Das kostet nichts und läuft ohne Server.
 - **Portionen umrechnen**: Mengen passen sich an die Personenzahl an (z. B. 1½ EL → 3 EL, 600 g → 1,2 kg)
+- **Zutaten mit Überschriften** gliedern („Für den Teig“, „Für den Belag“)
+- **Zutaten pro Schritt**: Die App erkennt, welche Zutaten in einem Schritt vorkommen, und zeigt sie dort mit umgerechneter Menge. Im Editor lässt sich das pro Schritt ändern.
 - **Kochmodus**: Zutaten und Schritte abhaken, der Bildschirm bleibt an
 - **Kategorien und eigene Schlagwörter** (Hauptspeise, Nachtisch, Vegan … oder „Mag Melli“) mit Filtern
 - **Suche** in Titel, Zutaten und Schritten, dazu **„Was hab ich da?“**: vorhandene Zutaten eingeben, passende Rezepte stehen oben
-- **Wochenplan** (Mo–So) mit Personenzahl pro Gericht
+- **Wochenplan** (Mo–So) mit Personenzahl pro Gericht, auch Essen ohne Rezept („Kalt“, „Reste“)
+- **Vorschläge beim Einplanen**: „Oft & gern“ und „Lange nicht mehr“, berechnet aus dem bisherigen Wochenplan
 - **Einkaufsliste**: Zutaten der Woche oder eines Rezepts übernehmen, gleiche Zutaten werden zusammengezählt, alles bleibt bearbeitbar. Abhaken klappt auch im Supermarkt ohne Netz.
 - **Gemeinsam nutzen**: mehrere Handys teilen sich einen „Haushalt“ (Einladecode), Änderungen erscheinen sofort auf den anderen Geräten
 
@@ -26,7 +29,9 @@ Ohne eingerichtete Datenbank funktioniert alles nur auf einem Handy.
 4. Unter **Authentication → URL Configuration** als **Site URL** die Adresse der App eintragen (z. B. `https://cezzyl-vault.github.io/Rezept-App/`). Dorthin führt der Bestätigungslink in der Registrierungs-Mail.
 5. Änderungen committen und pushen.
 
-Danach in der App oben rechts auf 👥 tippen, registrieren, **Haushalt anlegen** und den Einladecode an die anderen weitergeben. Bisher nur lokal gespeicherte Rezepte werden dabei übernommen.
+**Bestehende Installationen** (vor November 2026 eingerichtet): einmal [`supabase/update-2.sql`](supabase/update-2.sql) im SQL Editor ausführen. Damit kann der Wochenplan Essen ohne Rezept speichern.
+
+Danach in der App oben rechts auf das Personen-Symbol tippen, registrieren, **Haushalt anlegen** und den Einladecode an die anderen weitergeben. Bisher nur lokal gespeicherte Rezepte werden dabei übernommen.
 
 Kostenlose Supabase-Projekte pausieren nach 7 Tagen ohne Nutzung. Die GitHub-Action [`supabase-keepalive.yml`](.github/workflows/supabase-keepalive.yml) verhindert das, sobald `js/konfig.js` ausgefüllt ist. Ist die Datenbank doch einmal pausiert, zeigt die App einen Hinweis mit Link zum Dashboard („Restore“). Bis dahin speichert sie alle Änderungen auf dem Handy und überträgt sie später.
 
@@ -68,6 +73,9 @@ Dann im Browser `http://localhost:8080` öffnen.
 | `js/zutaten.js` | Zutaten zerlegen, umrechnen, zusammenzählen |
 | `js/texterkennung.js` | Texterkennung (Tesseract.js) und Vorsortierung |
 | `js/suche.js` | Kategorien, Suche, „Was hab ich da?“ |
+| `js/schritte.js` | Schritte und die Zutaten pro Schritt (automatisch erkannt oder von Hand) |
+| `js/vorschlaege.js` | Vorschläge aus dem Verlauf des Wochenplans |
+| `js/icons.js` | Linien-Icons |
 | `js/ansichten/*.js` | Die einzelnen Seiten (Liste, Rezept, Editor, Wochenplan, Einkauf, Konto) |
 | `supabase/setup.sql` | Tabellen, Zugriffsregeln und Foto-Speicher für Supabase |
 | `sw.js`, `manifest.webmanifest`, `icons/` | Offline-Start und Installation |

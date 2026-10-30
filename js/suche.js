@@ -1,5 +1,6 @@
 // Kategorien, Suche und "Was hab ich da?"
 import { normalisiereName, zutatPasst } from './zutaten.js';
+import { schrittText } from './schritte.js';
 
 export const KATEGORIEN = ['Vorspeise', 'Hauptspeise', 'Beilage', 'Nachtisch', 'Backen', 'Frühstück', 'Vegetarisch', 'Vegan'];
 
@@ -19,7 +20,7 @@ export function passtZurSuche(rezept, begriff) {
     rezept.titel, rezept.notiz, rezept.rohtext,
     ...(rezept.schlagwoerter || []),
     ...(rezept.zutaten || []).map((z) => z.name),
-    ...(rezept.schritte || []),
+    ...(rezept.schritte || []).map(schrittText),
   ].join(' ').toLowerCase();
   return begriff.toLowerCase().split(/\s+/).filter(Boolean).every((w) => text.includes(w));
 }

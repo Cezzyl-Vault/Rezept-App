@@ -1,5 +1,6 @@
 // Liste aller Rezepte mit Suche, Kategorie-Filtern und "Was hab ich da?"
 import { h, fuelle } from '../dom.js';
+import { icon } from '../icons.js';
 import * as speicher from '../speicher.js';
 import { setzeKopf, zeigeTabs, zeigeFab } from '../ui.js';
 import { gehe } from '../navigation.js';
@@ -31,7 +32,7 @@ export async function zeige(bereich) {
   function zeichneEntwurf() {
     const e = holeEntwurf();
     fuelle(entwurfHinweis, e ? h('div', { class: 'hinweis-karte' },
-      h('span', {}, '📝 Nicht gespeichert: ', h('strong', {}, e.rezept.titel || 'Neues Rezept')),
+      h('span', {}, icon('stift', { groesse: 16 }), ' Nicht gespeichert: ', h('strong', {}, e.rezept.titel || 'Neues Rezept')),
       h('button', { class: 'btn klein', type: 'button', onclick: () => gehe(e.neu ? '#/neu' : '#/bearbeiten/' + e.rezept.id) }, 'Weiter'),
       h('button', { class: 'btn klein text', type: 'button', onclick: () => { verwerfeEntwurf(); zeichneEntwurf(); } }, 'Verwerfen'),
     ) : '');
@@ -43,7 +44,7 @@ export async function zeige(bereich) {
       h('button', {
         type: 'button', class: 'chip besonders' + (zustand.wasDa ? ' aktiv' : ''),
         onclick: () => { zustand.wasDa = !zustand.wasDa; zeichneChips(); zeichneWasDa(); zeichneListe(); },
-      }, '🧺 Was hab ich da?'),
+      }, icon('korb', { groesse: 16 }), 'Was hab ich da?'),
       ...schlagwoerter.map((s) => h('button', {
         type: 'button', class: 'chip' + (zustand.filter.has(s) ? ' aktiv' : ''),
         onclick: () => {
@@ -77,7 +78,7 @@ export async function zeige(bereich) {
       h('div', { class: 'chips' }, zustand.vorhanden.map((v) => h('button', {
         type: 'button', class: 'chip aktiv', 'aria-label': v + ' entfernen',
         onclick: () => { zustand.vorhanden = zustand.vorhanden.filter((x) => x !== v); zeichneWasDa(); zeichneListe(); },
-      }, v + ' ✕'))),
+      }, v, icon('kreuz', { groesse: 14 })))),
       eingabe,
       h('label', { class: 'schalter' },
         h('input', {
@@ -105,7 +106,7 @@ export async function zeige(bereich) {
     suche.hidden = rezepte.length === 0;
     chips.hidden = rezepte.length === 0;
     if (rezepte.length === 0) {
-      fuelle(leer, h('div', { class: 'leer-symbol' }, '📖'), h('p', {}, 'Noch keine Rezepte.'),
+      fuelle(leer, h('div', { class: 'leer-symbol' }, icon('buch', { groesse: 44 })), h('p', {}, 'Noch keine Rezepte.'),
         h('p', {}, 'Tippe unten auf ', h('strong', {}, '+'), ', um ein Rezept zu fotografieren oder einzutippen.'));
     } else if (!treffer.length) {
       fuelle(leer, h('p', {}, zustand.wasDa && zustand.vorhanden.length ? 'Kein Rezept mit diesen Zutaten gefunden.' : 'Kein Rezept gefunden.'));

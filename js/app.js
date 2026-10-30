@@ -3,6 +3,7 @@ import { $, h } from './dom.js';
 import { waehle, waehleFotos, entferneAlleOverlays, zeigeFehler, zeigeMeldung } from './ui.js';
 import { beiNavigation, gehe, geheZurueck } from './navigation.js';
 import { gibUrlsFrei } from './bilder.js';
+import { icon } from './icons.js';
 import * as sync from './sync.js';
 import { dashboardUrl } from './supabase.js';
 import { starteEntwurf } from './entwurf.js';
@@ -61,6 +62,11 @@ beiNavigation(() => zeigeAnsicht());
 
 // ---------- Kopfzeile, Tabs, Plus-Knopf ----------
 
+// Icons in das feste Grundgerüst einsetzen (Tabs, Kopfzeile, Plus-Knopf)
+for (const platz of document.querySelectorAll('[data-icon]')) {
+  platz.replaceChildren(icon(platz.dataset.icon, { groesse: platz.id === 'neu-btn' ? 28 : 22 }));
+}
+
 $('zurueck').addEventListener('click', () => geheZurueck());
 $('konto-btn').addEventListener('click', () => gehe('#/konto'));
 
@@ -73,9 +79,9 @@ for (const link of $('tabs').querySelectorAll('a')) {
 
 $('neu-btn').addEventListener('click', () => {
   waehle('Neues Rezept', [
-    { wert: 'kamera', text: '📷 Foto aufnehmen', klasse: '', sofort: () => waehleFotos('kamera', erkennen.neuAusFotos) },
-    { wert: 'galerie', text: '🖼️ Foto aus der Galerie', sofort: () => waehleFotos('galerie', erkennen.neuAusFotos) },
-    { wert: 'selbst', text: '✍️ Selbst eingeben' },
+    { wert: 'kamera', text: 'Foto aufnehmen', icon: 'kamera', klasse: '', sofort: () => waehleFotos('kamera', erkennen.neuAusFotos) },
+    { wert: 'galerie', text: 'Foto aus der Galerie', icon: 'bild', sofort: () => waehleFotos('galerie', erkennen.neuAusFotos) },
+    { wert: 'selbst', text: 'Selbst eingeben', icon: 'stift' },
   ]).then((wahl) => {
     if (wahl === 'selbst') { starteEntwurf(); gehe('#/neu'); }
   });
@@ -89,7 +95,7 @@ function zeigeStatus() {
   const leiste = $('hinweis-leiste');
   if (s === 'pausiert') {
     leiste.replaceChildren(
-      h('span', {}, '⏸️ Die Datenbank ist pausiert. Änderungen werden gespeichert und später übertragen.'),
+      h('span', {}, 'Die Datenbank ist pausiert. Änderungen werden gespeichert und später übertragen.'),
       h('a', { href: dashboardUrl(), target: '_blank', rel: 'noopener' }, 'Aktivieren'));
     leiste.hidden = false;
   } else if (s === 'abgemeldet' || s === 'kein-haushalt') {

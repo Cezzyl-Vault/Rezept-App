@@ -1,9 +1,11 @@
-// Wochenplan: Rezepte auf Tage verteilen, mit Personenanzahl.
+// Wochenplan: Rezepte oder freie Einträge ("Kalt") auf Tage verteilen, mit Personenanzahl.
 import { h, fuelle } from '../dom.js';
 import * as speicher from '../speicher.js';
 import { setzeKopf, zeigeTabs, zeigeFab, zeigeMeldung, zeigeFehler, blatt } from '../ui.js';
 import { gehe } from '../navigation.js';
+import { icon } from '../icons.js';
 import { aufDieListe } from './einkauf.js';
+import { verlauf, oftUndGern, langeNicht, beschreibung, freieTitel } from '../vorschlaege.js';
 
 const TAGE = ['Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag', 'Sonntag'];
 const pad = (n) => String(n).padStart(2, '0');
@@ -53,16 +55,17 @@ export async function zeige(bereich, wochenstart) {
     const [plan, rezepte] = await Promise.all([speicher.alle('plan'), speicher.alle('rezepte')]);
     const nachId = new Map(rezepte.map((r) => [r.id, r]));
     const vonBis = [isoDatum(tage[0]), isoDatum(tage[6])];
-    const dieseWoche = plan.filter((p) => p.datum >= vonBis[0] && p.datum <= vonBis[1] && nachId.has(p.rezept_id));
+    const dieseWoche = plan.filter((p) => p.datum >= vonBis[0] && p.datum <= vonBis[1] && (nachId.has(p.rezept_id) || (!p.rezept_id && p.titel)));
+    const mitRezept = dieseWoche.filter((p) => nachId.has(p.rezept_id));
 
-    fuelle(bereich, 
+    fuelle(bereich,
       h('div', { class: 'wochen-kopf' },
-        h('button', { class: 'rund', type: 'button', 'aria-label': 'Vorige Woche', onclick: () => gehe('#/plan/' + isoDatum(plusTage(montag, -7)), true) }, '‹'),
+        h('button', { class: 'rund', type: 'button', 'aria-label': 'Vorige Woche', onclick: () => gehe('#/plan/' + isoDatum(plusTage(montag, -7)), true) }, icon('zurueck', { groesse: 20 })),
         h('div', { class: 'wochen-titel' },
           h('strong', {}, 'KW ' + kalenderwoche(montag)),
-          h('span', {}, ` ${kurz(tage[0])} – ${kurz(tage[6])}`),
-          istDieseWoche ? null : h('button', { class: 'link', type: 'button', onclick: () => gehe('#/plan', true) }, 'Heute')),
-        h('button', { class: 'rund', type: 'button', 'aria-label': 'Nächste Woche', onclick: () => gehe('#/plan/' + isoDatum(plusTage(montag, 7)), true) }, '›')),
+          h('span', {}, `${kurz(tage[0])} – ${kurz(tage[6])}`),
+          istDieseWoche ? null : h('button', { class: 'link', type: 'button', onclick: () => gehe('#/plan', true) }, 'Zur aktuellen Woche')),
+        h('button', { class: 'rund', type: 'button', 'aria-label': 'Nächste Woche', onclick: () => gehe('#/plan/' + isoDatum(plusTage(montag, 7)), true) }, icon('weiter', { groesse: 20 }))),
 
       ...tage.map((tag) => {
         const datum = isoDatum(tag);
@@ -70,17 +73,30 @@ export async function zeige(bereich, wochenstart) {
         return h('section', { class: 'tag' + (datum === isoDatum(new Date()) ? ' heute' : '') + (datum < isoDatum(new Date()) ? ' vorbei' : '') },
           h('div', { class: 'tag-kopf' }, h('span', {}, tagName(tag)), h('span', { class: 'meta' }, kurz(tag))),
           ...eintraege.map((p) => eintragZeile(p, nachId.get(p.rezept_id))),
-          h('button', { class: 'btn text links klein', type: 'button', onclick: () => rezeptEinplanen(datum, rezepte) }, '+ Rezept'));
+          h('button', { class: 'btn text links klein', type: 'button', onclick: () => einplanen(datum, rezepte, plan) }, icon('plus', { groesse: 16 }), 'Hinzufügen'));
       }),
 
-      dieseWoche.length ? h('button', {
+      mitRezept.length ? h('button', {
         class: 'btn', type: 'button',
-        onclick: () => aufDieListe(dieseWoche.map((p) => ({ rezept: nachId.get(p.rezept_id), portionen: p.portionen, planEintrag: p }))),
-      }, '🛒 Zutaten dieser Woche auf die Einkaufsliste') : h('p', { class: 'leer' }, 'Für diese Woche ist noch nichts geplant.'),
+        onclick: () => aufDieListe(mitRezept.map((p) => ({ rezept: nachId.get(p.rezept_id), portionen: p.portionen, planEintrag: p }))),
+      }, icon('wagen', { groesse: 20 }), 'Zutaten dieser Woche auf die Einkaufsliste')
+        : !dieseWoche.length ? h('p', { class: 'leer' }, 'Für diese Woche ist noch nichts geplant.') : null,
     );
   }
 
   function eintragZeile(p, rezept) {
+    const entfernen = h('button', {
+      class: 'mini', type: 'button', 'aria-label': 'Aus dem Plan entfernen',
+      onclick: () => speicher.loesche('plan', p.id).catch(zeigeFehler),
+    }, icon('kreuz', { groesse: 18 }));
+
+    // Essen ohne Rezept
+    if (!rezept) {
+      return h('div', { class: 'plan-eintrag frei' },
+        h('span', { class: 'plan-titel' }, icon('teller', { groesse: 16 }), p.titel),
+        entfernen);
+    }
+
     const aendere = async (schritt) => {
       try {
         await speicher.speichere('plan', { ...p, portionen: Math.max(1, (p.portionen || rezept.portionen || 2) + schritt) });
@@ -88,15 +104,12 @@ export async function zeige(bereich, wochenstart) {
     };
     return h('div', { class: 'plan-eintrag' },
       h('button', { class: 'plan-titel', type: 'button', onclick: () => gehe('#/rezept/' + rezept.id) },
-        rezept.titel, p.auf_liste ? h('span', { class: 'marke-klein', title: 'Schon auf der Einkaufsliste' }, '🛒') : null),
+        rezept.titel, p.auf_liste ? h('span', { class: 'marke-klein', title: 'Schon auf der Einkaufsliste' }, icon('wagen', { groesse: 14 })) : null),
       h('div', { class: 'portionen klein' },
-        h('button', { class: 'rund klein', type: 'button', 'aria-label': 'Weniger Personen', onclick: () => aendere(-1) }, '−'),
+        h('button', { class: 'rund klein', type: 'button', 'aria-label': 'Weniger Personen', onclick: () => aendere(-1) }, icon('minus', { groesse: 14 })),
         h('span', {}, (p.portionen || rezept.portionen || '?') + ' P.'),
-        h('button', { class: 'rund klein', type: 'button', 'aria-label': 'Mehr Personen', onclick: () => aendere(1) }, '+')),
-      h('button', {
-        class: 'mini', type: 'button', 'aria-label': 'Aus dem Plan entfernen',
-        onclick: () => speicher.loesche('plan', p.id).catch(zeigeFehler),
-      }, '✕'));
+        h('button', { class: 'rund klein', type: 'button', 'aria-label': 'Mehr Personen', onclick: () => aendere(1) }, icon('plus', { groesse: 14 }))),
+      entfernen);
   }
 
   await zeichne();
@@ -105,30 +118,62 @@ export async function zeige(bereich, wochenstart) {
   return () => window.removeEventListener('daten', beiDaten);
 }
 
-// Auswahl eines Rezepts mit Suche
-export function waehleRezept(rezepte) {
-  const sortiert = [...rezepte].sort((a, b) => a.titel.localeCompare(b.titel, 'de'));
+// Merkt sich den zuletzt gewählten Reiter
+let letzterReiter = null;
+
+// Auswahl: freier Eintrag oder Rezept (mit Vorschlägen). Ergebnis: { rezept } | { titel } | null
+export function waehleEintrag(rezepte, plan) {
+  const statistik = verlauf(plan);
+  const reiter = [
+    { id: 'oft', text: 'Oft & gern', icon: 'herz', liste: () => oftUndGern(rezepte, statistik), leer: 'Hier erscheinen Rezepte, die ihr mindestens zweimal gekocht habt.' },
+    { id: 'lange', text: 'Lange nicht mehr', icon: 'uhr', liste: () => langeNicht(rezepte, statistik), leer: 'Alles, was ihr schon länger nicht gekocht habt.' },
+    { id: 'alle', text: 'Alle', icon: 'buch', liste: () => [...rezepte].sort((a, b) => a.titel.localeCompare(b.titel, 'de')), leer: 'Noch keine Rezepte vorhanden.' },
+  ];
+  let aktiv = letzterReiter || (oftUndGern(rezepte, statistik).length ? 'oft' : 'alle');
+
   return blatt((fertig) => {
-    const liste = h('div', { class: 'auswahl-liste' });
+    const frei = h('input', { type: 'text', placeholder: 'Ohne Rezept, z. B. Kalt, Reste, Pizza', enterkeyhint: 'done', autocomplete: 'off' });
+    const freiFormular = h('form', { class: 'frei-eintrag', onsubmit: (e) => { e.preventDefault(); if (frei.value.trim()) fertig({ titel: frei.value.trim() }); } },
+      frei, h('button', { class: 'btn klein', type: 'submit' }, 'Eintragen'));
+    const bekannte = freieTitel(plan);
+    const reiterLeiste = h('div', { class: 'reiter' });
     const suche = h('input', { type: 'search', class: 'suche', placeholder: 'Rezept suchen …', autocomplete: 'off' });
+    const liste = h('div', { class: 'auswahl-liste' });
+
     const zeichne = () => {
+      fuelle(reiterLeiste, reiter.map((r) => h('button', {
+        type: 'button', class: 'reiter-knopf' + (r.id === aktiv ? ' aktiv' : ''),
+        onclick: () => { aktiv = r.id; letzterReiter = r.id; zeichne(); },
+      }, icon(r.icon, { groesse: 16 }), r.text)));
       const b = suche.value.trim().toLowerCase();
-      const treffer = sortiert.filter((r) => !b || r.titel.toLowerCase().includes(b));
-      fuelle(liste, ...treffer.map((r) => h('button', { type: 'button', class: 'auswahl-eintrag', onclick: () => fertig(r) }, r.titel)),
-        treffer.length ? null : h('p', { class: 'meta' }, rezepte.length ? 'Kein Rezept gefunden.' : 'Noch keine Rezepte vorhanden.'));
+      const r = reiter.find((x) => x.id === aktiv);
+      const treffer = r.liste().filter((x) => !b || x.titel.toLowerCase().includes(b));
+      fuelle(liste, ...treffer.map((x) => h('button', { type: 'button', class: 'auswahl-eintrag', onclick: () => fertig({ rezept: x }) },
+        h('span', { class: 'auswahl-titel' }, x.titel),
+        h('span', { class: 'meta' }, beschreibung(statistik, x.id)))),
+      treffer.length ? null : h('p', { class: 'meta leer-klein' }, b ? 'Kein Rezept gefunden.' : r.leer));
     };
     suche.addEventListener('input', zeichne);
     zeichne();
-    return [h('h2', { class: 'blatt-titel' }, 'Rezept auswählen'), suche, liste,
-      h('button', { class: 'btn text', type: 'button', onclick: () => fertig(null) }, 'Abbrechen')];
+    return [
+      h('h2', { class: 'blatt-titel' }, 'Was gibt es?'),
+      freiFormular,
+      bekannte.length ? h('div', { class: 'chips' }, bekannte.map((t) => h('button', { type: 'button', class: 'chip', onclick: () => fertig({ titel: t }) }, t))) : null,
+      reiterLeiste, suche, liste,
+      h('button', { class: 'btn text', type: 'button', onclick: () => fertig(null) }, 'Abbrechen'),
+    ];
   }, { voll: true });
 }
 
-async function rezeptEinplanen(datum, rezepte) {
-  const rezept = await waehleRezept(rezepte);
-  if (!rezept) return;
+async function einplanen(datum, rezepte, plan) {
+  const wahl = await waehleEintrag(rezepte, plan);
+  if (!wahl) return;
   try {
-    await speicher.speichere('plan', { id: speicher.neueId(), datum, rezept_id: rezept.id, portionen: rezept.portionen || 2, auf_liste: false });
+    if (wahl.rezept) {
+      await speicher.speichere('plan', { id: speicher.neueId(), datum, rezept_id: wahl.rezept.id, portionen: wahl.rezept.portionen || 2, auf_liste: false });
+    } else {
+      await speicher.speichere('plan', { id: speicher.neueId(), datum, rezept_id: null, titel: wahl.titel, portionen: null, auf_liste: false });
+    }
   } catch (f) {
     zeigeFehler(f);
   }
@@ -140,8 +185,8 @@ export async function inDenWochenplan(rezept, portionen) {
   const datum = await blatt((fertig) => [
     h('h2', { class: 'blatt-titel' }, 'An welchem Tag?'),
     h('div', { class: 'auswahl-liste' }, tage.map((t) => h('button', {
-      type: 'button', class: 'auswahl-eintrag', onclick: () => fertig(isoDatum(t)),
-    }, tagName(t), h('span', { class: 'meta' }, ' ' + kurz(t))))),
+      type: 'button', class: 'auswahl-eintrag zeilig', onclick: () => fertig(isoDatum(t)),
+    }, h('span', { class: 'auswahl-titel' }, tagName(t)), h('span', { class: 'meta' }, kurz(t))))),
     h('button', { class: 'btn text', type: 'button', onclick: () => fertig(null) }, 'Abbrechen'),
   ], { voll: true });
   if (!datum) return;

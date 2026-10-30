@@ -1,6 +1,6 @@
 // Speichert die App-Dateien zwischen, damit die App auch ohne Internet startet.
 // Bei jeder Änderung an den Dateien VERSION erhöhen, sonst sehen Nutzer die alte Version.
-const VERSION = 'rezepte-v2';
+const VERSION = 'rezepte-v3';
 const DATEIEN = [
   './',
   'index.html',
@@ -10,14 +10,17 @@ const DATEIEN = [
   'js/bilder.js',
   'js/dom.js',
   'js/entwurf.js',
+  'js/icons.js',
   'js/konfig.js',
   'js/navigation.js',
+  'js/schritte.js',
   'js/speicher.js',
   'js/suche.js',
   'js/supabase.js',
   'js/sync.js',
   'js/texterkennung.js',
   'js/ui.js',
+  'js/vorschlaege.js',
   'js/zutaten.js',
   'js/ansichten/editor.js',
   'js/ansichten/einkauf.js',
@@ -32,8 +35,8 @@ const DATEIEN = [
   'icons/icon-512-maskable.png',
 ];
 
-// Bibliotheken mit fester Versionsnummer ändern sich nie → dauerhaft zwischenspeichern
-const CDN = 'https://cdn.jsdelivr.net/';
+// Bibliotheken mit fester Versionsnummer und Schriften ändern sich nie → dauerhaft zwischenspeichern
+const DAUERHAFT = ['https://cdn.jsdelivr.net/', 'https://fonts.googleapis.com/', 'https://fonts.gstatic.com/'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(caches.open(VERSION).then((cache) => cache.addAll(DATEIEN)).then(() => self.skipWaiting()));
@@ -51,12 +54,13 @@ self.addEventListener('fetch', (event) => {
   const anfrage = event.request;
   if (anfrage.method !== 'GET') return;
 
-  if (anfrage.url.startsWith(CDN)) {
+  if (DAUERHAFT.some((adresse) => anfrage.url.startsWith(adresse))) {
     event.respondWith(caches.open('cdn').then(async (cache) => {
       const treffer = await cache.match(anfrage);
       if (treffer) return treffer;
       const antwort = await fetch(anfrage);
-      if (antwort.ok) cache.put(anfrage, antwort.clone());
+      // Schriften lädt der Browser ohne CORS ("opaque") – auch die zwischenspeichern
+      if (antwort.ok || antwort.type === 'opaque') cache.put(anfrage, antwort.clone());
       return antwort;
     }));
     return;
